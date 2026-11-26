@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img">
+  <title>Equal Housing Opportunity</title>
+  <path fill="#1e3a66" d="M60 10L12 48v62h36V78h24v32h36V48L60 10z"/>
+  <circle cx="60" cy="64" r="24" fill="#ffffff"/>
+  <rect x="48" y="58" width="24" height="5" fill="#1e3a66"/>
+  <rect x="48" y="67" width="24" height="5" fill="#1e3a66"/>
+</svg>
