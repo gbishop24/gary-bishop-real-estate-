@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Field } from "../components/Field.jsx";
-import { submitLead } from "../lib/submitLead.js";
+import { submitNetlifyForm } from "../lib/submitNetlifyForm.js";
 
 const STEPS = [
   "Get pre-approved with a lender.",
@@ -13,32 +13,28 @@ const STEPS = [
 export default function Buyers() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
 
-  function onSubmit(event) {
+  async function onSubmit(event) {
     event.preventDefault();
     setError("");
-    const data = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const data = new FormData(form);
 
-    if (data.get("consent") !== "on") {
+    if (data.get("consent") !== "yes") {
       setError("Please agree to be contacted before submitting.");
       return;
     }
 
-    submitLead({
-      subject: "Buyer Inquiry — Putnam County Home Search",
-      fields: {
-        "First Name": data.get("firstName"),
-        "Last Name": data.get("lastName"),
-        Email: data.get("email"),
-        Phone: data.get("phone"),
-        "Areas of interest": data.get("areas"),
-        "Price range": data.get("priceRange"),
-        Timeframe: data.get("timeframe"),
-        "Pre-approved": data.get("preapproved"),
-        Comments: data.get("comments"),
-      },
-    });
-    setSubmitted(true);
+    setSending(true);
+    try {
+      await submitNetlifyForm(form);
+      setSubmitted(true);
+    } catch {
+      setError("Something went wrong sending your request. Please try again or call 386-916-9896.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -83,12 +79,26 @@ export default function Buyers() {
               <div className="form-success" role="status">
                 <h3>Thanks — Gary will be in touch within 24 hours.</h3>
                 <p>
-                  If your email app opened a draft, send it to finish the request. Prefer to
-                  talk now? Call <a href="tel:3869169896">386-916-9896</a>.
+                  Prefer to talk now? Call <a href="tel:3869169896">386-916-9896</a>.
                 </p>
               </div>
             ) : (
-              <form className="lead-form" onSubmit={onSubmit}>
+              <form
+                className="lead-form"
+                name="buyers"
+                method="POST"
+                data-netlify="true"
+                netlify-honeypot="bot-field"
+                onSubmit={onSubmit}
+              >
+                <input type="hidden" name="form-name" value="buyers" />
+                <p className="sr-only" aria-hidden="true">
+                  <label>
+                    Don’t fill this out if you’re human:{" "}
+                    <input name="bot-field" tabIndex={-1} autoComplete="off" />
+                  </label>
+                </p>
+
                 <div className="field-row two">
                   <Field id="firstName" label="First Name" required autoComplete="given-name" />
                   <Field id="lastName" label="Last Name" required autoComplete="family-name" />
@@ -98,6 +108,7 @@ export default function Buyers() {
                 <Field
                   id="areas"
                   label="Areas of interest"
+                  name="areas"
                   placeholder="Palatka, Interlachen, Crescent City…"
                 />
 
@@ -112,10 +123,10 @@ export default function Buyers() {
                     <option value="" disabled>
                       Select an option
                     </option>
-                    <option>Under $150k</option>
-                    <option>$150k–$250k</option>
-                    <option>$250k–$400k</option>
-                    <option>$400k+</option>
+                    <option value="Under $150k">Under $150k</option>
+                    <option value="$150k–$250k">$150k–$250k</option>
+                    <option value="$250k–$400k">$250k–$400k</option>
+                    <option value="$400k+">$400k+</option>
                   </select>
                 </Field>
 
@@ -130,10 +141,10 @@ export default function Buyers() {
                     <option value="" disabled>
                       Select an option
                     </option>
-                    <option>0–3 months</option>
-                    <option>3–6 months</option>
-                    <option>6–12 months</option>
-                    <option>Just browsing</option>
+                    <option value="0–3 months">0–3 months</option>
+                    <option value="3–6 months">3–6 months</option>
+                    <option value="6–12 months">6–12 months</option>
+                    <option value="Just browsing">Just browsing</option>
                   </select>
                 </Field>
 
@@ -157,7 +168,7 @@ export default function Buyers() {
                 <Field id="comments" label="Comments" as="textarea" />
 
                 <label className="consent">
-                  <input type="checkbox" name="consent" required />
+                  <input type="checkbox" name="consent" value="yes" required />
                   <span>
                     I agree to be contacted by Gary Bishop of Coldwell Banker Ben Bates, Inc.
                     by phone, text, or email about my home search. Consent is not a condition of
@@ -168,8 +179,8 @@ export default function Buyers() {
                 {error ? <p className="form-error">{error}</p> : null}
 
                 <div className="form-actions">
-                  <button className="btn btn-primary" type="submit">
-                    Get Started
+                  <button className="btn btn-primary" type="submit" disabled={sending}>
+                    {sending ? "Sending…" : "Get Started"}
                   </button>
                 </div>
               </form>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Field } from "../components/Field.jsx";
-import { submitLead } from "../lib/submitLead.js";
+import { submitNetlifyForm } from "../lib/submitNetlifyForm.js";
 
 const AREAS = [
   "Palatka",
@@ -14,35 +14,28 @@ const AREAS = [
 export default function Home() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [sending, setSending] = useState(false);
 
-  function onSubmit(event) {
+  async function onSubmit(event) {
     event.preventDefault();
     setError("");
-    const data = new FormData(event.currentTarget);
+    const form = event.currentTarget;
+    const data = new FormData(form);
 
-    if (data.get("consent") !== "on") {
+    if (data.get("consent") !== "yes") {
       setError("Please agree to be contacted before submitting.");
       return;
     }
 
-    submitLead({
-      subject: "Home Value Estimate Request — Putnam County",
-      fields: {
-        "First Name": data.get("firstName"),
-        "Last Name": data.get("lastName"),
-        Email: data.get("email"),
-        Phone: data.get("phone"),
-        Country: data.get("country"),
-        "Address Line 1": data.get("address1"),
-        "Address Line 2": data.get("address2"),
-        City: data.get("city"),
-        State: data.get("state"),
-        ZIP: data.get("zip"),
-        "Looking to sell": data.get("timeline"),
-        Notes: data.get("notes"),
-      },
-    });
-    setSubmitted(true);
+    setSending(true);
+    try {
+      await submitNetlifyForm(form);
+      setSubmitted(true);
+    } catch {
+      setError("Something went wrong sending your request. Please try again or call 386-916-9896.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -89,14 +82,28 @@ export default function Home() {
               <div className="form-success" role="status">
                 <h3>Thanks — Gary will be in touch within 24 hours.</h3>
                 <p>
-                  If your email app opened a draft, send it to finish the request. You can
-                  also reach Gary anytime at{" "}
+                  You can also reach Gary anytime at{" "}
                   <a href="tel:3869169896">386-916-9896</a> or{" "}
                   <a href="mailto:GBishop24@icloud.com">GBishop24@icloud.com</a>.
                 </p>
               </div>
             ) : (
-              <form className="lead-form" onSubmit={onSubmit} noValidate={false}>
+              <form
+                className="lead-form"
+                name="contact"
+                method="POST"
+                data-netlify="true"
+                netlify-honeypot="bot-field"
+                onSubmit={onSubmit}
+              >
+                <input type="hidden" name="form-name" value="contact" />
+                <p className="sr-only" aria-hidden="true">
+                  <label>
+                    Don’t fill this out if you’re human:{" "}
+                    <input name="bot-field" tabIndex={-1} autoComplete="off" />
+                  </label>
+                </p>
+
                 <div className="field-row two">
                   <Field id="firstName" label="First Name" required autoComplete="given-name" />
                   <Field id="lastName" label="Last Name" required autoComplete="family-name" />
@@ -112,9 +119,9 @@ export default function Home() {
                     required
                     defaultValue="United States"
                   >
-                    <option>United States</option>
-                    <option>Canada</option>
-                    <option>Other</option>
+                    <option value="United States">United States</option>
+                    <option value="Canada">Canada</option>
+                    <option value="Other">Other</option>
                   </select>
                 </Field>
 
@@ -137,16 +144,16 @@ export default function Home() {
                     <option value="" disabled>
                       Select an option
                     </option>
-                    <option>ASAP</option>
-                    <option>1-3 months</option>
-                    <option>3-6 months</option>
-                    <option>6-12 months</option>
-                    <option>Just curious</option>
+                    <option value="ASAP">ASAP</option>
+                    <option value="1-3 months">1-3 months</option>
+                    <option value="3-6 months">3-6 months</option>
+                    <option value="6-12 months">6-12 months</option>
+                    <option value="Just curious">Just curious</option>
                   </select>
                 </Field>
 
                 <label className="consent">
-                  <input type="checkbox" name="consent" required />
+                  <input type="checkbox" name="consent" value="yes" required />
                   <span>
                     I agree to be contacted by Gary Bishop of Coldwell Banker Ben Bates, Inc.
                     by phone, text, or email about my property. Consent is not a condition of
@@ -159,8 +166,8 @@ export default function Home() {
                 {error ? <p className="form-error">{error}</p> : null}
 
                 <div className="form-actions">
-                  <button className="btn btn-primary" type="submit">
-                    Get My Free Home Value
+                  <button className="btn btn-primary" type="submit" disabled={sending}>
+                    {sending ? "Sending…" : "Get My Free Home Value"}
                   </button>
                 </div>
               </form>
