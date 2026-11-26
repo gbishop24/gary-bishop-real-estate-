@@ -52,7 +52,7 @@ export default function Buyers() {
               action="https://formsubmit.co/gbishop24@icloud.com"
               method="POST"
             >
-              <input type="hidden" name="_subject" value="New Real Estate Lead" />
+              <input type="hidden" name="_subject" value="New Buyer Real Estate Lead" />
               <input type="hidden" name="_captcha" value="false" />
               <input type="hidden" name="_template" value="table" />
 
