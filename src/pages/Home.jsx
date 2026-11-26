@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { Field } from "../components/Field.jsx";
-import { submitNetlifyForm } from "../lib/submitNetlifyForm.js";
 
 const AREAS = [
   "Palatka",
@@ -12,32 +10,6 @@ const AREAS = [
 ];
 
 export default function Home() {
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState("");
-  const [sending, setSending] = useState(false);
-
-  async function onSubmit(event) {
-    event.preventDefault();
-    setError("");
-    const form = event.currentTarget;
-    const data = new FormData(form);
-
-    if (data.get("consent") !== "yes") {
-      setError("Please agree to be contacted before submitting.");
-      return;
-    }
-
-    setSending(true);
-    try {
-      await submitNetlifyForm(form);
-      setSubmitted(true);
-    } catch {
-      setError("Something went wrong sending your request. Please try again or call 386-916-9896.");
-    } finally {
-      setSending(false);
-    }
-  }
-
   return (
     <>
       <section className="hero" aria-label="Gary Bishop, Putnam County REALTOR">
@@ -78,100 +50,92 @@ export default function Home() {
           </div>
 
           <div className="form-panel center-block">
-            {submitted ? (
-              <div className="form-success" role="status">
-                <h3>Thanks — Gary will be in touch within 24 hours.</h3>
-                <p>
-                  You can also reach Gary anytime at{" "}
-                  <a href="tel:3869169896">386-916-9896</a> or{" "}
-                  <a href="mailto:GBishop24@icloud.com">GBishop24@icloud.com</a>.
-                </p>
+            <form
+              className="lead-form"
+              action="https://formsubmit.co/gbishop24@icloud.com"
+              method="POST"
+            >
+              <input type="hidden" name="_subject" value="New Real Estate Lead" />
+              <input type="hidden" name="_captcha" value="false" />
+              <input type="hidden" name="_template" value="table" />
+
+              <div className="field-row two">
+                <Field id="firstName" label="First Name" required autoComplete="given-name" />
+                <Field id="lastName" label="Last Name" required autoComplete="family-name" />
               </div>
-            ) : (
-              <form
-                className="lead-form"
-                name="contact"
-                method="POST"
-                data-netlify="true"
-                netlify-honeypot="bot-field"
-                onSubmit={onSubmit}
-              >
-                <input type="hidden" name="form-name" value="contact" />
-                <p className="sr-only" aria-hidden="true">
-                  <label>
-                    Don’t fill this out if you’re human:{" "}
-                    <input name="bot-field" tabIndex={-1} autoComplete="off" />
-                  </label>
-                </p>
+              <Field id="email" label="Email" type="email" required autoComplete="email" />
+              <Field id="phone" label="Phone" type="tel" required autoComplete="tel" />
 
-                <div className="field-row two">
-                  <Field id="firstName" label="First Name" required autoComplete="given-name" />
-                  <Field id="lastName" label="Last Name" required autoComplete="family-name" />
-                </div>
-                <Field id="email" label="Email" type="email" required autoComplete="email" />
-                <Field id="phone" label="Phone" type="tel" required autoComplete="tel" />
-
-                <Field id="country" label="Country" as="select" required defaultValue="United States">
-                  <select
-                    className="field-select"
-                    id="country"
-                    name="country"
-                    required
-                    defaultValue="United States"
-                  >
-                    <option value="United States">United States</option>
-                    <option value="Canada">Canada</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </Field>
-
-                <Field
-                  id="address1"
-                  label="Address Line 1"
+              <Field id="country" label="Country" as="select" required defaultValue="United States">
+                <select
+                  className="field-select"
+                  id="country"
+                  name="country"
                   required
-                  autoComplete="address-line1"
+                  defaultValue="United States"
+                >
+                  <option value="United States">United States</option>
+                  <option value="Canada">Canada</option>
+                  <option value="Other">Other</option>
+                </select>
+              </Field>
+
+              <Field
+                id="address1"
+                label="Address Line 1"
+                required
+                autoComplete="address-line1"
+              />
+              <Field id="address2" label="Address Line 2" autoComplete="address-line2" />
+
+              <div className="field-row three">
+                <Field id="city" label="City" required autoComplete="address-level2" />
+                <Field
+                  id="state"
+                  label="State"
+                  required
+                  autoComplete="address-level1"
+                  defaultValue="FL"
                 />
-                <Field id="address2" label="Address Line 2" autoComplete="address-line2" />
+                <Field id="zip" label="ZIP Code" required autoComplete="postal-code" />
+              </div>
 
-                <div className="field-row three">
-                  <Field id="city" label="City" required autoComplete="address-level2" />
-                  <Field id="state" label="State" required autoComplete="address-level1" defaultValue="FL" />
-                  <Field id="zip" label="ZIP Code" required autoComplete="postal-code" />
-                </div>
+              <Field id="timeline" label="When are you looking to sell?" as="select" required>
+                <select
+                  className="field-select"
+                  id="timeline"
+                  name="timeline"
+                  required
+                  defaultValue=""
+                >
+                  <option value="" disabled>
+                    Select an option
+                  </option>
+                  <option value="ASAP">ASAP</option>
+                  <option value="1-3 months">1-3 months</option>
+                  <option value="3-6 months">3-6 months</option>
+                  <option value="6-12 months">6-12 months</option>
+                  <option value="Just curious">Just curious</option>
+                </select>
+              </Field>
 
-                <Field id="timeline" label="When are you looking to sell?" as="select" required>
-                  <select className="field-select" id="timeline" name="timeline" required defaultValue="">
-                    <option value="" disabled>
-                      Select an option
-                    </option>
-                    <option value="ASAP">ASAP</option>
-                    <option value="1-3 months">1-3 months</option>
-                    <option value="3-6 months">3-6 months</option>
-                    <option value="6-12 months">6-12 months</option>
-                    <option value="Just curious">Just curious</option>
-                  </select>
-                </Field>
+              <label className="consent">
+                <input type="checkbox" name="consent" value="yes" required />
+                <span>
+                  I agree to be contacted by Gary Bishop of Coldwell Banker Ben Bates, Inc. by
+                  phone, text, or email about my property. Consent is not a condition of any
+                  purchase. Msg &amp; data rates may apply; reply STOP to opt out.
+                </span>
+              </label>
 
-                <label className="consent">
-                  <input type="checkbox" name="consent" value="yes" required />
-                  <span>
-                    I agree to be contacted by Gary Bishop of Coldwell Banker Ben Bates, Inc.
-                    by phone, text, or email about my property. Consent is not a condition of
-                    any purchase. Msg &amp; data rates may apply; reply STOP to opt out.
-                  </span>
-                </label>
+              <Field id="notes" label="Notes" as="textarea" />
 
-                <Field id="notes" label="Notes" as="textarea" />
-
-                {error ? <p className="form-error">{error}</p> : null}
-
-                <div className="form-actions">
-                  <button className="btn btn-primary" type="submit" disabled={sending}>
-                    {sending ? "Sending…" : "Get My Free Home Value"}
-                  </button>
-                </div>
-              </form>
-            )}
+              <div className="form-actions">
+                <button className="btn btn-primary" type="submit">
+                  Get My Free Home Value
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </section>
