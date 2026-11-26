@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="8" fill="#1E3A66"/>
+  <path d="M32 14L14 28v22h12V38h12v12h12V28L32 14z" fill="#F4F7FB"/>
+  <text x="32" y="36" text-anchor="middle" font-family="Georgia,serif" font-size="14" font-weight="700" fill="#1E3A66">GB</text>
+</svg>
