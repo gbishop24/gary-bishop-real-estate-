@@ -294,6 +294,13 @@ p {
   transform: translateY(-1px);
 }
 
+.btn:disabled,
+.btn:disabled:hover {
+  cursor: wait;
+  opacity: 0.72;
+  transform: none;
+}
+
 .btn-primary {
   background: var(--navy);
   color: #fff;

@@ -2,6 +2,17 @@
   command = "npm run build"
   publish = "dist"
 
+[functions]
+  directory = "netlify/functions"
+
+# Copy each lead to Google Sheets. The function reads GOOGLE_SHEETS_WEB_APP_URL.
+# This rule has to stay above the SPA fallback.
+[[redirects]]
+  from = "/api/lead"
+  to = "/.netlify/functions/save-lead"
+  status = 200
+  force = true
+
 # SPA fallback so /buyers and deep links serve index.html
 [[redirects]]
   from = "/*"
