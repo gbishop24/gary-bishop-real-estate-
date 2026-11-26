@@ -1,4 +1,5 @@
 import { Field } from "../components/Field.jsx";
+import { submitLeadForm } from "../lib/submitLeadForm.js";
 
 const AREAS = [
   "Palatka",
@@ -54,8 +55,9 @@ export default function Home() {
               className="lead-form"
               action="https://formsubmit.co/gbishop24@icloud.com"
               method="POST"
+              onSubmit={(event) => submitLeadForm(event, "seller")}
             >
-              <input type="hidden" name="_subject" value="New Real Estate Lead" />
+              <input type="hidden" name="_subject" value="New Seller Real Estate Lead" />
               <input type="hidden" name="_captcha" value="false" />
               <input type="hidden" name="_template" value="table" />
 

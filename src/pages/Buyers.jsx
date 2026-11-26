@@ -1,4 +1,5 @@
 import { Field } from "../components/Field.jsx";
+import { submitLeadForm } from "../lib/submitLeadForm.js";
 
 const STEPS = [
   "Get pre-approved with a lender.",
@@ -51,8 +52,9 @@ export default function Buyers() {
               className="lead-form"
               action="https://formsubmit.co/gbishop24@icloud.com"
               method="POST"
+              onSubmit={(event) => submitLeadForm(event, "buyer")}
             >
-              <input type="hidden" name="_subject" value="New Real Estate Lead" />
+              <input type="hidden" name="_subject" value="New Buyer Real Estate Lead" />
               <input type="hidden" name="_captcha" value="false" />
               <input type="hidden" name="_template" value="table" />
 

@@ -16,4 +16,4 @@ npm run build
 npm run preview
 ```
 
-Lead forms open a prefilled email draft to `GBishop24@icloud.com`.
+Lead forms email `gbishop24@icloud.com` through FormSubmit. Each lead is also saved to Google Sheets after the one-time setup in [google-apps-script/README.md](google-apps-script/README.md). Until that setup is finished, the emails still send.
